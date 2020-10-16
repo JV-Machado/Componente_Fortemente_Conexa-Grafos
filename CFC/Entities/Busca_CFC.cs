@@ -9,9 +9,14 @@ namespace CFC.Entities
     {
         public int Tempo { get; set; }
         public Grafo G { get; set; }
-        
+        public Stack<Vertice> Pilha { get; set; }
+        public List<Vertice> Componentes { get; set; }
+        //public List<List<Vertice>> Componentes { get; set; }
+
         public Busca_CFC(Grafo g)
         {
+            Componentes = new List<Vertice>();
+            Pilha = new Stack<Vertice>();
             G = g;
         }
 
@@ -19,21 +24,37 @@ namespace CFC.Entities
         {
             foreach (Vertice V in G.Lista_Vertices)
             {
-                V.Estado = State.fresh;
-
+                V.Estado = State.fresh;             
             }
             Tempo = 0;
-            foreach (Vertice V in G.Lista_Vertices)
+            if(Pilha.Count == 0)
             {
-                if (V.Estado == State.fresh)
+                foreach (Vertice V in G.Lista_Vertices)
                 {
-                    DFS_Visita(V);
+                    if (V.Estado == State.fresh)
+                    {
+                        DFS_Visita(V, -1);
+                    }
                 }
-
             }
+            else
+            {
+                int i = 0;
+                while(Pilha.Count > 0)
+                {
+                    Vertice v = Pilha.Pop();
+                    if (v.Estado == State.fresh)
+                    {
+                        //Componentes[i] = new List<Vertice>();
+                        DFS_Visita(v,i);
+                        i++;
+                    }
+                }
+            }
+            
         }
 
-        public void DFS_Visita(Vertice V)
+        public void DFS_Visita(Vertice V, int i)
         {
             V.Estado = State.visiting;
             Tempo++;
@@ -55,16 +76,29 @@ namespace CFC.Entities
                 {
                     s.V_Pai = V;
 
-                    DFS_Visita(s);                 
+                    DFS_Visita(s, i);                 
                 }
                 
             }
             
             V.Estado = State.visited;
             V.Tempo_Fechamento = ++Tempo;
-            
+            if(i == -1)
+            {
+                PreenchePilha(V);
+            }
+            else
+            {
+                Componentes.Add(V);
+                //Componentes[i].Add(V);
+            }
         }
         
+        public void PreenchePilha(Vertice v)
+        {
+            Pilha.Push(v);     
+        }
+
         public void InverterArestas()
         {
             foreach(Vertice vert in G.Lista_Vertices)
@@ -92,6 +126,22 @@ namespace CFC.Entities
                 {
                     vert.Lista_Vizinhos.Add(adj);
                 }
+            }
+        }
+
+        public void ExecutarCFC()
+        {
+            DFS_Marcacao_Fresh();
+            //Mostrar();
+
+            InverterArestas();
+            LimparListaVizinhos();
+            ReceberListaArestaInvertida();
+
+            DFS_Marcacao_Fresh();
+            foreach(Vertice v in Componentes)
+            {
+                Console.WriteLine(v);
             }
         }
 

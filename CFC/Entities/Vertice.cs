@@ -9,6 +9,7 @@ namespace CFC.Entities
         public string Nome { get; set; }
         public List<Vertice> Lista_Vizinhos { get; set; }
         public List<Vertice> Lista_Vizinhos_Invertida { get; set; }
+       
         public int Tempo_Descoberta { get; set; }
         public int Tempo_Fechamento { get; set; }
         public Vertice V_Pai { get; set; }

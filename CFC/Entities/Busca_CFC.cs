@@ -10,12 +10,12 @@ namespace CFC.Entities
         public int Tempo { get; set; }
         public Grafo G { get; set; }
         public Stack<Vertice> Pilha { get; set; }
-        public List<Vertice> Componentes { get; set; }
-        //public List<List<Vertice>> Componentes { get; set; }
+        public List<List<Vertice>> Componentes { get; set; }
+        public List<Vertice> Sublista_Componentes { get; set; }
 
         public Busca_CFC(Grafo g)
         {
-            Componentes = new List<Vertice>();
+            Componentes = new List<List<Vertice>>();
             Pilha = new Stack<Vertice>();
             G = g;
         }
@@ -45,9 +45,10 @@ namespace CFC.Entities
                     Vertice v = Pilha.Pop();
                     if (v.Estado == State.fresh)
                     {
-                        //Componentes[i] = new List<Vertice>();
+                        Sublista_Componentes = new List<Vertice>();
                         DFS_Visita(v,i);
                         i++;
+                        Componentes.Add(Sublista_Componentes);
                     }
                 }
             }
@@ -62,16 +63,6 @@ namespace CFC.Entities
            
             foreach (Vertice s in V.Lista_Vizinhos)
             {
-                /*
-                if (s.Estado == State.visiting)
-                {
-                    Console.WriteLine($"{s} Voltou");
-                }
-                else
-                {
-                    Console.WriteLine($"{s} Ok");
-                }
-                */
                 if (s.Estado == State.fresh)
                 {
                     s.V_Pai = V;
@@ -89,8 +80,7 @@ namespace CFC.Entities
             }
             else
             {
-                Componentes.Add(V);
-                //Componentes[i].Add(V);
+                Sublista_Componentes.Add(V);    
             }
         }
         
@@ -132,28 +122,27 @@ namespace CFC.Entities
         public void ExecutarCFC()
         {
             DFS_Marcacao_Fresh();
-            //Mostrar();
 
             InverterArestas();
             LimparListaVizinhos();
             ReceberListaArestaInvertida();
 
-            DFS_Marcacao_Fresh();
-            foreach(Vertice v in Componentes)
-            {
-                Console.WriteLine(v);
-            }
+            DFS_Marcacao_Fresh();       
         }
 
         public void Mostrar()
         {
-            var order = G.Lista_Vertices.OrderBy(x => x.Tempo_Descoberta);
-
-            foreach (var t in order)
-            {
-                Console.WriteLine($"Pai {t.V_Pai} --> Vertice: {t.Nome} Descoberta: {t.Tempo_Descoberta} Fechamento: {t.Tempo_Fechamento}");
-            }
+            Console.WriteLine("Componentes Fortemente Conexas:");
             Console.WriteLine();
+            foreach(var Sublist in Componentes)
+            {
+                foreach(var value in Sublist)
+                {
+                    Console.WriteLine(value);
+                }
+                Console.WriteLine();
+            }
         }
+        
     }
 }

@@ -66,7 +66,8 @@ namespace CFC
             Busca_CFC cfc = new Busca_CFC(grafo);
 
             cfc.ExecutarCFC();
-
+            cfc.Mostrar();
+            Console.WriteLine();
         }
     }
 }
